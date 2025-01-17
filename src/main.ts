@@ -5,8 +5,8 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
     <h1>Websockets</h1>
 
-    <span>Offline</span>
+    <span id="state">Offline</span>
   </div>
 `
 //Ejecutar conexión a websocket
-connectToServer();
+connectToServer(<HTMLSpanElement>document.getElementById('state'));
