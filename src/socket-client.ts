@@ -10,10 +10,11 @@ export const connectToServer = (span: HTMLSpanElement) =>{
 }
 
 const addListeners = (socket: Socket) =>{
-    const serverStatusLabel = document.querySelector('#state')!;
     const clientsUl = document.querySelector('#clients-ul')!;
     const formMessage = document.querySelector('#message-form')!;
     const inputMessage = document.querySelector<HTMLInputElement>('#message-input')!;
+    const messagesUl = document.querySelector<HTMLUListElement>('#messages-ul')!;
+    const serverStatusLabel = document.querySelector('#state')!;
 
     //TODO: #clients-ul
     socket.on('clients-updated', (clients: string[])=>{
@@ -31,6 +32,13 @@ const addListeners = (socket: Socket) =>{
     
     socket.on('disconnect', () =>{
         serverStatusLabel.innerHTML = 'Disconnected';
+    })
+
+    socket.on('message-from-server', (payload: { fullName: String, message: string})=>{
+        console.log(payload);
+        let {fullName, message} = payload;
+
+        messagesUl.innerHTML += `<li>${fullName}: ${message}</li>`
     })
 
     formMessage.addEventListener('submit', (event)=>{

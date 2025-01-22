@@ -7,13 +7,14 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 
     <span id="state">Offline</span>
 
+    <ul id="clients-ul"></ul>
+
     <form id="message-form">
       <input placeholder="message" id="message-input"></input>
     </form>
 
-    <ul id="clients-ul">
-      
-    </ul>
+    <h3>Messages</h3>
+    <ul id="messages-ul"></ul>
   </div>
 `
 //Ejecutar conexión a websocket
