@@ -16,33 +16,49 @@ export const connectToServer = (span: HTMLSpanElement, token: string) =>{
     addListeners(); //Añadir listeners nuevos
 }
 
-const addListeners = () =>{
+const formSubmitListener = (event: Event) => {
+    const inputMessage = document.querySelector<HTMLInputElement>('#message-input')!;
+    event.preventDefault();
+    if (inputMessage.value.trim().length <= 0) return; // Validar que haya contenido en el input
+
+    // Emitir mensaje desde el cliente
+    socket.emit('message-from-client', { message: inputMessage.value });
+
+    // Vaciar input
+    inputMessage.value = '';
+};
+
+const addListeners = () => {
     const clientsUl = document.querySelector('#clients-ul')!;
+    const formMessage = document.querySelector('#message-form')!;
     const messagesUl = document.querySelector<HTMLUListElement>('#messages-ul')!;
     const serverStatusLabel = document.querySelector('#state')!;
 
-    //TODO: #clients-ul
-    socket.on('clients-updated', (clients: string[])=>{
-        let clientsHTML = ``;
+    // Listener para actualizar clientes
+    socket.on('clients-updated', (clients: string[]) => {
+        let clientsHTML = '';
         clients.forEach(clientId => {
-            clientsHTML +=  `<li>${clientId}</li>`;
-        })
+            clientsHTML += `<li>${clientId}</li>`;
+        });
         clientsUl.innerHTML = clientsHTML;
-    })
+    });
 
-
-    socket.on('connect', ()=>{
+    // Listener para estado de conexión
+    socket.on('connect', () => {
         serverStatusLabel.innerHTML = 'Connected';
-    })
-    
-    socket.on('disconnect', () =>{
+    });
+
+    socket.on('disconnect', () => {
         serverStatusLabel.innerHTML = 'Disconnected';
-    })
+    });
 
-    socket.on('message-from-server', (payload: { fullName: String, message: string})=>{
-        console.log(payload);
-        let {fullName, message} = payload;
+    // Listener para mensajes del servidor
+    socket.on('message-from-server', (payload: { fullName: string; message: string }) => {
+        const { fullName, message } = payload;
+        messagesUl.innerHTML += `<li>${fullName}: ${message}</li>`;
+    });
 
-        messagesUl.innerHTML += `<li>${fullName}: ${message}</li>`
-    })
-}
+    // **Eliminar listener existente antes de agregarlo**
+    formMessage.removeEventListener('submit', formSubmitListener); // Evita duplicados
+    formMessage.addEventListener('submit', formSubmitListener); // Agrega nuevo listener
+};
