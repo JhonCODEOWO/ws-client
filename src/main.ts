@@ -26,8 +26,23 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 // connectToServer(<HTMLSpanElement>document.getElementById('state'));
 const inputJwt = document.querySelector<HTMLInputElement>('#jwtoken')!;
 const btnConnect = document.querySelector<HTMLButtonElement>('#btnConnect')!;
+const formMessage = document.querySelector('#message-form')!;
+const inputMessage = document.querySelector<HTMLInputElement>('#message-input')!;
+
+formMessage.addEventListener('submit', (event)=>{
+  event.preventDefault();
+  if (inputMessage.value.trim().length < 0) return; //Validar que haya contenido en el input
+
+  //Emitir mensaje desde el cliente
+  socket.emit('message-from-client', {id: 'Yo', message: inputMessage.value});
+
+  //Vacíar input
+  inputMessage.value = '';
+})
 
 btnConnect.addEventListener('click', ()=>{
   if (inputJwt.value.trim().length <= 0) return alert('Enter a valid JWT');
   connectToServer(<HTMLSpanElement>document.getElementById('state'), inputJwt.value.trim());
 })
+
+

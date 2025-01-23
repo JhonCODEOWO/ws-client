@@ -1,22 +1,23 @@
 import { Manager, Socket } from 'socket.io-client'
 
+let socket: Socket;
+let manager: Manager;
 export const connectToServer = (span: HTMLSpanElement, token: string) =>{
     // http://localhost:3000/socket.io/socket.io.js
-    const manager = new Manager('http://localhost:3000/socket.io/socket.io.js', {
+    manager = new Manager('http://localhost:3000/socket.io/socket.io.js', {
         extraHeaders: {
             token: token
         }
     }); //Asignar la url de la conexión
 
-    const socket = manager.socket('/'); //Conectar al namespace /
-
-    addListeners(socket);
+    socket?.removeAllListeners(); //Eliminar todos los listeners anteriores asignados a este objeto
+    socket = manager.socket('/'); //Conectar al namespace /
+    console.log(socket);
+    addListeners(); //Añadir listeners nuevos
 }
 
-const addListeners = (socket: Socket) =>{
+const addListeners = () =>{
     const clientsUl = document.querySelector('#clients-ul')!;
-    const formMessage = document.querySelector('#message-form')!;
-    const inputMessage = document.querySelector<HTMLInputElement>('#message-input')!;
     const messagesUl = document.querySelector<HTMLUListElement>('#messages-ul')!;
     const serverStatusLabel = document.querySelector('#state')!;
 
@@ -43,16 +44,5 @@ const addListeners = (socket: Socket) =>{
         let {fullName, message} = payload;
 
         messagesUl.innerHTML += `<li>${fullName}: ${message}</li>`
-    })
-
-    formMessage.addEventListener('submit', (event)=>{
-        event.preventDefault();
-        if (inputMessage.value.trim().length < 0) return; //Validar que haya contenido en el input
-
-        //Emitir mensaje desde el cliente
-        socket.emit('message-from-client', {id: 'Yo', message: inputMessage.value});
-
-        //Vacíar input
-        inputMessage.value = '';
     })
 }
